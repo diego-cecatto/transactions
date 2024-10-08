@@ -19,7 +19,7 @@ export declare type FilterModel = {
     }
 }
 
-export class TransactionAction extends BaseActionMocked {
+export class TransactionAction {
 
     getAll(filter: FilterModel) {
         return fetch('http://localhost:3000/transactions', {
