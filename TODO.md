@@ -2,6 +2,10 @@ Problem Statement:
 [] create filter component
 [] Loading skeleton
 [] filter transactions by date range.
+[] skeleton
+[] show error to the user and in the grid
+[] add a button to return an error
+[]SUM in the bottom of the table
 
 Requirements:
  

@@ -18,6 +18,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
 import { TransactionsPage } from '../Transactions/Transactions';
+import './Base.scss';
+
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({

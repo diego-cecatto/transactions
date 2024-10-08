@@ -9,7 +9,6 @@ declare type FilterProps = {
 
 export function Filter({ children }: FilterProps) {
     const [open, setOpen] = useState(false);
-    console.log(open)
     return <>
         <IconButton onClick={() => setOpen(true)}>
             <FilterAltSharpIcon />
@@ -21,14 +20,17 @@ export function Filter({ children }: FilterProps) {
                     anchor: 'right',
                     SlideProps: {
                         direction: 'left',
-                        style: { minWidth: '50%', padding: '16px', zIndex: 100000000 },
+                        style: { minWidth: '60%', padding: '16px', zIndex: 100000000 },
                         className: 'modal-container',
                     },
                     onOpen: () => { },
                     open: open,
-                    sx: { zIndex: 100000000 },
+                    sx: {
+                        padding: '3999px'
+                    },
                     onClose: () => setOpen(false)
                 }}
+                className="filters"
             >
 
                 <IconButton

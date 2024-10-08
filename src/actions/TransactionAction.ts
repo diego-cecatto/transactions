@@ -1,9 +1,3 @@
-import { BaseActionMocked } from "./BaseActionMocked";
-import transactions from './Mocks/TransactionsMocks.json';
-
-declare type FilterRequest = {
-    page: number
-}
 
 export declare type TransactionItem = {
     TransactionID: string,
@@ -12,21 +6,28 @@ export declare type TransactionItem = {
     Amount: number
 }
 
+export declare type FilterModel = {
+    sort?: {
+        field: string,
+        sort: string
+    },
+    page: number,
+    filter?: {
+        date: {
+            start: string, end: string
+        }
+    }
+}
+
 export class TransactionAction extends BaseActionMocked {
 
-    getAll(
-        filter?: FilterRequest | undefined
-
-    ) {
-
-        //todo create pagination
-        //todo order according request
-        //todo default values
-
-        transactions.slice(filter.page - 1, filter.page * 30)
-
-        return this.request<TransactionItem[]>(
-            transactions
-        );
+    getAll(filter: FilterModel) {
+        return fetch('http://localhost:3000/transactions', {
+            method: 'POST', headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(filter),
+        })
     }
+
 }
