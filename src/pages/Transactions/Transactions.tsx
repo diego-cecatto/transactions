@@ -11,9 +11,10 @@ import {
     TransactionAction,
     TransactionItem,
 } from '../../actions/TransactionAction';
-import { Filter } from '../../components/Filter/Filter';
 import { TransactionsFilter } from './TransactionsFilter';
 import { useSnackbar } from 'notistack';
+import { Typography } from '@mui/material';
+import { CustomNoResultsOverlay } from '../../components/CustomOverlay/CustomOverlay';
 
 const columns: GridColDef[] = [
     {
@@ -41,7 +42,9 @@ const columns: GridColDef[] = [
 ];
 
 export function TransactionsPage() {
-    const [transactions, setTransactions] = useState<TransactionItem[]>([]);
+    const [transactions, setTransactions] = useState<
+        TransactionItem[] | null | false
+    >(null);
     const { enqueueSnackbar } = useSnackbar();
 
     const [filters, setFilter] = useState<FilterModel>({
@@ -58,10 +61,11 @@ export function TransactionsPage() {
             .getAll(filters)
             .then(async (res) => {
                 var transactions = await res.json();
-                setTransactions(transactions.data);
+                setTransactions(transactions);
                 enqueueSnackbar('Error on fetch data');
             })
             .catch(() => {
+                setTransactions(false);
                 enqueueSnackbar('Error on fetch data');
             });
     };
@@ -87,24 +91,23 @@ export function TransactionsPage() {
 
     return (
         <Box sx={{ height: '100%', width: '100%' }}>
-            <Filter>
-                <TransactionsFilter
-                    onFilterChange={(filter: {
-                        startDate: 'string';
-                        endDate: 'string';
-                    }) => {
-                        if (!filter || !filter.startDate || !filter.endDate) {
-                            return;
-                        }
-                        reFetchData({
-                            ...filters,
-                            filters: filter,
-                        });
-                    }}
-                />
-            </Filter>
+            <TransactionsFilter
+                onFilterChange={(filter: {
+                    rangeStart: 'string';
+                    rangeEnd: 'string';
+                }) => {
+                    if (filter && !filter.rangeStart && !filter.rangeEnd) {
+                        return;
+                    }
+                    console.log(filter);
+                    reFetchData({
+                        ...filters,
+                        filters: filter,
+                    });
+                }}
+            />
             <DataGrid
-                rows={transactions}
+                rows={transactions ? transactions.data : []}
                 getRowId={(row) => row.TransactionID}
                 columns={columns}
                 paginationMode="server"
@@ -118,9 +121,34 @@ export function TransactionsPage() {
                         },
                     },
                 }}
+                rowCount={transactions ? transactions.total : 0}
                 pageSizeOptions={[30]}
                 checkboxSelection
+                loading={transactions === null}
                 disableRowSelectionOnClick
+                slotProps={{
+                    loadingOverlay: {
+                        variant: 'skeleton',
+                        noRowsVariant: 'skeleton',
+                    },
+                }}
+                slots={{
+                    noRowsOverlay: () => (
+                        <Typography
+                            color={transactions === false ? 'error' : ''}
+                            sx={{
+                                textAlign: 'center',
+                                marginTop: '12px',
+                            }}
+                        >
+                            {transactions === false ? (
+                                'Error on fetch data'
+                            ) : (
+                                <CustomNoResultsOverlay />
+                            )}
+                        </Typography>
+                    ),
+                }}
             />
         </Box>
     );

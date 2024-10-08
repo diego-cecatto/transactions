@@ -28,11 +28,24 @@ app.post('/transactions', (req, res) => {
         page = 1,
         limit = 30,
         sort = { field: 'Date', sort: 'desc' },
-        filter,
+        filters,
     } = req.body;
     const pageNumber = parseInt(page);
     const limitNumber = parseInt(limit);
-    const sortedTransactions = sortTransactions([...transactions], sort);
+    let filteredTransactions = transactions;
+    if (filters) {
+        const rangeStart = new Date(filters.rangeStart);
+        const rangeEnd = new Date(filters.rangeEnd);
+        filteredTransactions = transactions.filter((transaction) => {
+            const transactionDate = new Date(transaction['Date']);
+            return transactionDate >= rangeStart && transactionDate <= rangeEnd;
+        });
+    }
+
+    const sortedTransactions = sortTransactions(
+        [...filteredTransactions],
+        sort
+    );
     const startIndex = (pageNumber - 1) * limitNumber;
     const paginatedTransactions = sortedTransactions.slice(
         startIndex,
