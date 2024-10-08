@@ -11,11 +11,9 @@ export declare type FilterModel = {
         sort: string;
     };
     page: number;
-    filter?: {
-        date: {
-            start: string;
-            end: string;
-        };
+    filters?: {
+        rangeStart: string;
+        rangeEnd: string;
     };
 };
 

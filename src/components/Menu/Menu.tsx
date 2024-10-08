@@ -1,42 +1,97 @@
-import * as React from 'react';
-import { styled, Theme, CSSObject } from '@mui/material/styles';
+import { styled, Theme, CSSObject, useTheme } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
-import { projectTheme } from './../../config/Theme';
-import { MenuHeader } from './MenuHeader';
-import './Menu.scss';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import AttachMoneySharpIcon from '@mui/icons-material/AttachMoneySharp';
+import { DrawerHeader } from './MenuHeader';
+const drawerWidth = 240;
+declare type MenuProps = {
+    open: boolean;
+    onClose: () => void;
+};
 
-export function Menu() {
-    const change = () => {
-        setOpen(!open);
-        window.setTimeout(() => {
-            window.dispatchEvent(new Event('resize'));
-        }, 250);
-    };
-
+export function Menu({ open, onClose }: MenuProps) {
+    const theme = useTheme();
     return (
-        <Drawer variant="permanent" open={open} id="menu">
-            <MenuHeader title={open ? 'Transactions' : ''} />
-            {/*<NavigationMenu
-                open={open}
-                projectTheme={projectTheme}
-                routes={routes}
-            />
-            <MenuFooter
-                drawerOpen={open}
-                toggleOpen={change}
-                theme={projectTheme}
-                project={project}
-                help={help}
-            /> */}
-            Menu
+        <Drawer variant="permanent" open={open}>
+            <DrawerHeader>
+                <IconButton onClick={onClose}>
+                    {theme.direction === 'rtl' ? (
+                        <ChevronRightIcon />
+                    ) : (
+                        <ChevronLeftIcon />
+                    )}
+                </IconButton>
+            </DrawerHeader>
+            <Divider />
+            <List>
+                {['Transactions'].map((text, index) => (
+                    <ListItem
+                        key={text}
+                        disablePadding
+                        sx={{ display: 'block' }}
+                    >
+                        <ListItemButton
+                            sx={[
+                                {
+                                    minHeight: 48,
+                                    px: 2.5,
+                                },
+                                open
+                                    ? {
+                                          justifyContent: 'initial',
+                                      }
+                                    : {
+                                          justifyContent: 'center',
+                                      },
+                            ]}
+                        >
+                            <ListItemIcon
+                                sx={[
+                                    {
+                                        minWidth: 0,
+                                        justifyContent: 'center',
+                                    },
+                                    open
+                                        ? {
+                                              mr: 3,
+                                          }
+                                        : {
+                                              mr: 'auto',
+                                          },
+                                ]}
+                            >
+                                <AttachMoneySharpIcon />
+                            </ListItemIcon>
+                            <ListItemText
+                                primary={text}
+                                sx={[
+                                    open
+                                        ? {
+                                              opacity: 1,
+                                          }
+                                        : {
+                                              opacity: 0,
+                                          },
+                                ]}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                ))}
+            </List>
         </Drawer>
     );
 }
 
 const openedMixin = (theme: Theme): CSSObject => ({
-    width: projectTheme.size.menu,
-    pallete: projectTheme.palette,
-    backgroundColor: projectTheme.palette.menu.main,
+    width: drawerWidth,
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
@@ -45,41 +100,38 @@ const openedMixin = (theme: Theme): CSSObject => ({
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
-    pallete: projectTheme.palette,
     transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
     }),
-    backgroundColor: projectTheme.palette.menu.main,
     overflowX: 'hidden',
-    width: `calc(${theme.spacing(7)} - 12px)`,
+    width: `calc(${theme.spacing(7)} + 1px)`,
     [theme.breakpoints.up('sm')]: {
-        width: `calc(${theme.spacing(9)} - 12px)`,
+        width: `calc(${theme.spacing(8)} + 1px)`,
     },
 });
 
 const Drawer = styled(MuiDrawer, {
     shouldForwardProp: (prop) => prop !== 'open',
-})(
-    ({
-        theme,
-        open,
-        projectTheme,
-    }: {
-        projectTheme: ProjectTheme;
-        theme?: any;
-        open: boolean;
-    }) => ({
-        width: 240,
-        flexShrink: 0,
-        whiteSpace: 'nowrap',
-        ...(open && {
-            ...openedMixin(theme, projectTheme),
-            '& .MuiDrawer-paper': openedMixin(theme, projectTheme),
-        }),
-        ...(!open && {
-            ...closedMixin(theme, projectTheme),
-            '& .MuiDrawer-paper': closedMixin(theme, projectTheme),
-        }),
-    })
-);
+})(({ theme }) => ({
+    width: drawerWidth,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+    variants: [
+        {
+            props: ({ open }) => open,
+            style: {
+                ...openedMixin(theme),
+                '& .MuiDrawer-paper': openedMixin(theme),
+            },
+        },
+        {
+            props: ({ open }) => !open,
+            style: {
+                ...closedMixin(theme),
+                '& .MuiDrawer-paper': closedMixin(theme),
+            },
+        },
+    ],
+}));
